@@ -18,7 +18,7 @@ export const ColorPicker = ({ color, onChange }: ColorPickerProps) => {
             color-picker__button--${item}
             ${color === item ? "active" : ""}
           `}
-          onClick={(event) => {
+          onPointerDown={(event) => {
             event.stopPropagation();
             onChange(item);
           }}
