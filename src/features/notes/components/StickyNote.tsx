@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, type RefObject } from "react";
 import type { Note } from "../types";
 import { useDrag } from "../hooks/useDrag";
 import { useResize } from "../hooks/useResize";
@@ -7,23 +7,29 @@ import "./StickyNote.scss";
 type StickyNoteProps = {
   note: Note;
   updateNote: (id: string, changes: Partial<Note>) => void;
+  removeNote: (id: string) => void;
   bringToFront: (id: string) => void;
+  trashRef: RefObject<HTMLDivElement | null>;
 };
 
 export const StickyNote = ({
   note,
   updateNote,
+  removeNote,
   bringToFront,
+  trashRef,
 }: StickyNoteProps) => {
   const { id, text, color, position, size, zIndex } = note;
-
   const noteRef = useRef<HTMLElement>(null);
+
   const drag = useDrag({
     id,
     position,
     ref: noteRef,
     updateNote,
+    removeNote,
     bringToFront,
+    trashRef,
   });
   const resize = useResize({ id, size, ref: noteRef, updateNote });
 

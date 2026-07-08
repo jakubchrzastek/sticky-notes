@@ -3,7 +3,7 @@ import { Board } from "./features/notes/components/Board";
 import "./App.scss";
 
 export const App = () => {
-  const { notes, addNote, updateNote, bringToFront } = useNotes();
+  const { notes, addNote, updateNote, removeNote, bringToFront } = useNotes();
 
   const handleCreateNote = (position: { x: number; y: number }) => {
     addNote({
@@ -21,6 +21,7 @@ export const App = () => {
       <Board
         notes={notes}
         updateNote={updateNote}
+        removeNote={removeNote}
         bringToFront={bringToFront}
         createNote={handleCreateNote}
       />

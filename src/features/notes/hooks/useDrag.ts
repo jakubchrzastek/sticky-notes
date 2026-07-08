@@ -16,7 +16,9 @@ type UseDragParams = {
   position: Point;
   ref: RefObject<HTMLElement | null>;
   updateNote: (id: string, changes: Partial<Note>) => void;
+  removeNote: (id: string) => void;
   bringToFront: (id: string) => void;
+  trashRef: RefObject<HTMLDivElement | null>;
 };
 
 export const useDrag = ({
@@ -24,7 +26,9 @@ export const useDrag = ({
   position,
   ref,
   updateNote,
+  removeNote,
   bringToFront,
+  trashRef,
 }: UseDragParams) => {
   const state = useRef<DragState>({
     active: false,
@@ -32,6 +36,18 @@ export const useDrag = ({
     startPosition: position,
     delta: { x: 0, y: 0 },
   });
+
+  const isInsideTrash = (element: HTMLElement, trash: HTMLElement) => {
+    const noteRect = element.getBoundingClientRect();
+    const trashRect = trash.getBoundingClientRect();
+
+    return (
+      noteRect.left < trashRect.right &&
+      noteRect.right > trashRect.left &&
+      noteRect.top < trashRect.bottom &&
+      noteRect.bottom > trashRect.top
+    );
+  };
 
   const onPointerDown = (event: PointerEvent<HTMLElement>) => {
     bringToFront(id);
@@ -64,20 +80,34 @@ export const useDrag = ({
       return;
     }
 
-    event.currentTarget.releasePointerCapture(event.pointerId);
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+
     state.current.active = false;
 
     const { startPosition, delta } = state.current;
 
+    const finalPosition = {
+      x: startPosition.x + delta.x,
+      y: startPosition.y + delta.y,
+    };
+
+    const isOverTrash =
+      ref.current &&
+      trashRef?.current &&
+      isInsideTrash(ref.current, trashRef.current);
+
     if (ref.current) {
       ref.current.style.transform = "";
     }
+    if (isOverTrash) {
+      removeNote(id);
+      return;
+    }
 
     updateNote(id, {
-      position: {
-        x: startPosition.x + delta.x,
-        y: startPosition.y + delta.y,
-      },
+      position: finalPosition,
     });
   };
 
