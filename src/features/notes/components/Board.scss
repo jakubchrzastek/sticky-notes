@@ -1,0 +1,8 @@
+.board {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 80px);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #c3c3c3;
+}
