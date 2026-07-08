@@ -20,6 +20,12 @@
     background: #f48fb1;
   }
 
+  &__resize {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+  }
+
   textarea {
     width: 100%;
     height: 100%;

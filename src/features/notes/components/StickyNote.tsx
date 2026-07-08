@@ -1,5 +1,7 @@
 import { useRef } from "react";
 import type { Note } from "../types";
+import { useDrag } from "../hooks/useDrag";
+import { useResize } from "../hooks/useResize";
 import "./StickyNote.scss";
 
 type StickyNoteProps = {
@@ -9,96 +11,24 @@ type StickyNoteProps = {
 };
 
 export const StickyNote = ({
-  note: { id, text, color, position, size, zIndex },
+  note,
   updateNote,
   bringToFront,
 }: StickyNoteProps) => {
+  const { id, text, color, position, size, zIndex } = note;
+
   const noteRef = useRef<HTMLElement>(null);
-
-  const dragRef = useRef({
-    dragging: false,
-    startPointer: {
-      x: 0,
-      y: 0,
-    },
-    startPosition: position,
-    offset: {
-      x: 0,
-      y: 0,
-    },
+  const drag = useDrag({
+    id,
+    position,
+    ref: noteRef,
+    updateNote,
+    bringToFront,
   });
-
-  const handlePointerDown = ({
-    clientX,
-    clientY,
-    currentTarget,
-    pointerId,
-  }: React.PointerEvent<HTMLElement>) => {
-    bringToFront(id);
-
-    currentTarget.setPointerCapture(pointerId);
-
-    dragRef.current = {
-      dragging: true,
-      startPointer: {
-        x: clientX,
-        y: clientY,
-      },
-      startPosition: position,
-      offset: {
-        x: 0,
-        y: 0,
-      },
-    };
-  };
-
-  const handlePointerMove = ({
-    clientX,
-    clientY,
-  }: React.PointerEvent<HTMLElement>) => {
-    if (!dragRef.current.dragging || !noteRef.current) {
-      return;
-    }
-
-    const deltaX = clientX - dragRef.current.startPointer.x;
-    const deltaY = clientY - dragRef.current.startPointer.y;
-
-    dragRef.current.offset = {
-      x: deltaX,
-      y: deltaY,
-    };
-
-    noteRef.current.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-  };
-
-  const handlePointerUp = ({
-    currentTarget,
-    pointerId,
-  }: React.PointerEvent<HTMLElement>) => {
-    if (!dragRef.current.dragging) {
-      return;
-    }
-
-    dragRef.current.dragging = false;
-
-    currentTarget.releasePointerCapture(pointerId);
-
-    if (noteRef.current) {
-      noteRef.current.style.transform = "";
-    }
-
-    updateNote(id, {
-      position: {
-        x: dragRef.current.startPosition.x + dragRef.current.offset.x,
-        y: dragRef.current.startPosition.y + dragRef.current.offset.y,
-      },
-    });
-  };
+  const resize = useResize({ id, size, ref: noteRef, updateNote });
 
   const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    updateNote(id, {
-      text: event.target.value,
-    });
+    updateNote(id, { text: event.target.value });
   };
 
   return (
@@ -112,11 +42,20 @@ export const StickyNote = ({
         height: size.height,
         zIndex,
       }}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
+      onPointerDown={drag.onPointerDown}
+      onPointerMove={drag.onPointerMove}
+      onPointerUp={drag.onPointerUp}
     >
       <textarea value={text} onChange={handleTextChange} />
+      <button
+        type="button"
+        className="sticky-note__resize"
+        onPointerDown={resize.onPointerDown}
+        onPointerMove={resize.onPointerMove}
+        onPointerUp={resize.onPointerUp}
+      >
+        Resize
+      </button>
     </article>
   );
 };
