@@ -3,6 +3,7 @@ import type { Note } from "../types";
 import { useDrag } from "../hooks/useDrag";
 import { useResize } from "../hooks/useResize";
 import "./StickyNote.scss";
+import { ColorPicker } from "./ColorPicker";
 
 type StickyNoteProps = {
   note: Note;
@@ -52,6 +53,14 @@ export const StickyNote = ({
       onPointerMove={drag.onPointerMove}
       onPointerUp={drag.onPointerUp}
     >
+      <ColorPicker
+        color={color}
+        onChange={(newColor: any) =>
+          updateNote(id, {
+            color: newColor,
+          })
+        }
+      />
       <textarea value={text} onChange={handleTextChange} />
       <button
         type="button"

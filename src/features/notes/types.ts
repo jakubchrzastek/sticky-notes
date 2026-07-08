@@ -1,4 +1,5 @@
-export type NoteColor = "yellow" | "blue" | "green" | "pink";
+export const NOTE_COLORS = ["yellow", "blue", "green", "pink"] as const;
+export type NoteColor = (typeof NOTE_COLORS)[number];
 
 export type Position = {
   x: number;

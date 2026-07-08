@@ -1,0 +1,36 @@
+.color-picker {
+  display: flex;
+  gap: 6px;
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+}
+
+.color-picker__button {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  cursor: pointer;
+  padding: 0;
+
+  &.active {
+    border-color: black;
+  }
+
+  &--yellow {
+    background: #ffd966;
+  }
+
+  &--green {
+    background: #93c47d;
+  }
+
+  &--blue {
+    background: #76a5af;
+  }
+
+  &--pink {
+    background: #c27ba0;
+  }
+}
